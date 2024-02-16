@@ -1,18 +1,18 @@
-const  {Employee}  = require('../db/db')
+const  {Employee, Attendance}  = require('../db/db')
 const express = require('express');
 const router = express.Router();
 const z = require('zod');
 const jwt = require('jsonwebtoken');
 const {SECRET, authenticate} = require('../middlewares/authMiddleware')
 
-//signup input schemas 
+//signup input schemas
 const signuInputs = z.object({
     username: z.string().min(4).max(40),
     email: z.string().email(),
     password: z.string().min(4)
 })
 
-//login input schemas 
+//login input schemas
 const loginInputs = z.object({
     email: z.string().email(),
     password: z.string().min(4)
@@ -49,16 +49,199 @@ router.post('/login', async(req, res)=>{
     
     const emp = await Employee.findOne({email, password})
     if(emp){
-        const token = jwt.sign({email, role:'emp'}, SECRET, {expiresIn : '1h'});
+        const token = jwt.sign(
+            { _id: emp._id, email, role: 'emp' },
+            SECRET,
+            { expiresIn: '1h' }
+        );
         res.json({messege: "Logged in succesfully", token})
     }else{
         res.status(400).json({error: "Invalid Creadentials"})
     }
 })
 
-router.post('/checkin', authenticate, (req,res)=>{
-    const checkinTime = new Date();
+router.post('/checkin', authenticate, async (req,res)=>{
+    try {
+        // Extract user ID from the authenticated request
+        const { _id: employeeId } = req.user;
+        const { date, checkInTime } = req.body;
+        console.log({date, checkInTime});
+        // Check if the user has already checked in for the specified date
+        const existingAttendance = await Attendance.findOne({
+            employeeId,
+            date: date || new Date()
+        });
 
-    res.send(checkin);
+        if (existingAttendance) {
+            return res.status(400).json({ message: 'User has already checked in for the day' });
+        }
+        // if not checked in then create new record and save that
+        const newAttendance = new Attendance({
+            employeeId,
+            date: date || new Date(),
+            checkInTime: checkInTime || new Date()
+        });
+
+        await newAttendance.save();
+
+        res.status(201).json({ message: 'Check-in successful', attendance: newAttendance });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 })
+
+//route to start the break 
+router.post('/startbreak', authenticate, async (req, res) => {
+    try {
+      
+        const { _id: employeeId } = req.user;
+
+        // Extract data from the request body
+        const { date, breakStartTime } = req.body;
+
+        // Find the attendance record for the specified user and date
+        const attendance = await Attendance.findOne({
+            employeeId,
+            date: date || new Date()
+        });
+
+        if (!attendance) {
+            // No attendance record found for the user on the specified date
+            return res.status(404).json({ message: 'Attendance record not found' });
+        }
+        if (attendance.checkOutTime) {
+            return res.status(400).json({ message: 'User has already checked out for the day so he can not start break' });
+        }
+        // Check if the user has already started a break for the specified date
+        if (attendance.breakTimes.some(breakEntry => !breakEntry.end)) {
+            return res.status(400).json({ message: 'User has already started a break' });
+        }
+
+        // Add a new break entry with the provided start time
+        attendance.breakTimes.push({ start: breakStartTime || new Date() });
+
+    
+        await attendance.save();
+
+        res.status(201).json({ message: 'Break started successfully', attendance });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
+router.post('/endbreak', authenticate, async (req, res) => {
+    try {
+    
+        const { _id: employeeId } = req.user;
+        
+        const { date, breakEndTime } = req.body;
+
+        // Find the attendance record for the specified user and date
+        const attendance = await Attendance.findOne({
+            employeeId,
+            date: date || new Date()
+        });
+
+        if (!attendance) {
+            // No attendance record found for the user on the specified date
+            return res.status(404).json({ message: 'Attendance record not found' });
+        }
+        if (attendance.checkOutTime) {
+            return res.status(400).json ({ message: 'User has already checked out for the day so he can not start/end break' });
+        }
+        // Find the last break entry that doesn't have an end time (i.e., the active break)
+        const activeBreak = attendance.breakTimes.find(breakEntry => !breakEntry.end);
+
+        if (!activeBreak) {
+            return res.status(400).json({ message: 'No active break found' });
+        }
+
+        // Set the end time for the active break
+        activeBreak.end = breakEndTime || new Date();
+
+        // Calculate the duration of the break and update totalWorkedHours
+        const breakDuration = activeBreak.end - activeBreak.start;
+        attendance.totalWorkedHours -= breakDuration;
+
+        await attendance.save();
+
+        res.status(201).json({ message: 'Break ended successfully', attendance });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.post('/checkout', authenticate, async (req, res) => {
+    try {
+        const { _id: employeeId } = req.user;
+
+        const { date, checkOutTime } = req.body;
+
+        const attendance = await Attendance.findOne({
+            employeeId,
+            date: date || new Date()
+        });
+
+        if (!attendance) {
+            return res.status(404).json({ message: 'Attendance record not found' });
+        }
+
+        if (attendance.checkOutTime) {
+            return res.status(400).json({ message: 'User has already checked out for the day' });
+        }
+        
+        // Set the check-out time only if provided in the request body
+        if (checkOutTime !== undefined) {
+            attendance.checkOutTime = checkOutTime;
+        } else {
+            attendance.checkOutTime = new Date();
+        }
+
+        const checkInTime = attendance.checkInTime || attendance.date;
+        const breaksDuration = attendance.breakTimes.reduce((total, breakEntry) => {
+            if (breakEntry.start && breakEntry.end) {
+                return total + (breakEntry.end - breakEntry.start);
+            }
+            return total;
+        }, 0);
+        const totalWorkedHours =
+            (attendance.checkOutTime - checkInTime - breaksDuration) / (1000 * 60 * 60); // Convert milliseconds to hours
+
+        // Update totalWorkedHours in the attendance record
+        attendance.totalWorkedHours = totalWorkedHours;
+
+        // Save the updated attendance record to the database
+        await attendance.save();
+
+        res.status(201).json({
+            message: 'Checkout successful',
+            totalWorkedHours,
+            attendance
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+//to get the all data
+router.get('/me', authenticate, async (req,res)=>{
+    const { _id: employeeId } = req.user;
+    try {
+        const attendanceData = await Attendance.find({ employeeId });
+
+        if (!attendanceData || attendanceData.length === 0) {
+            return res.status(404).json({ message: 'No attendance records found for the user' });
+        }
+
+        res.status(200).json({ message: 'Attendance data retrieved successfully', attendance: attendanceData });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+})
+
 module.exports = router

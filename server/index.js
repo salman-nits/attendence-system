@@ -3,7 +3,7 @@ const cors = require('cors')
 const mongoose = require('mongoose');
 const dotenv = require('dotenv')
 const app = express()
-// const adminRouter = require('./src/routes/adminRoutes')
+const adminRouter = require('./src/routes/adminRoutes')
 const employeeRouter = require('./src/routes/employeeRoutes')
 dotenv.config();
 app.use(cors());
@@ -13,8 +13,8 @@ const port = process.env.PORT;
 const dbUrl = process.env.DATABASE_URL;
 
 //admin apis
-// app.use('/admin',adminRouter);
-app.use('/api/emp/v1', employeeRouter)
+app.use('/api/admin/v1',adminRouter);
+app.use('/api/emp/v1', employeeRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
