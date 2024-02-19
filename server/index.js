@@ -16,8 +16,8 @@ const dbUrl = process.env.DATABASE_URL;
 app.use('/api/admin/v1',adminRouter);
 app.use('/api/emp/v1', employeeRouter);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(port, '0.0.0.0',() => {
+  console.log(`Server is running on http://0.0.0.0:${port}`)
 })
 
 mongoose.connect(`${dbUrl}`);

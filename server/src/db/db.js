@@ -18,14 +18,12 @@ const employeeSchema = new mongoose.Schema({
     password : String
 })
 
-
-
 const attendanceSchema = new mongoose.Schema({
     employeeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee'
     },
-    date: Date,
+    date: String,
     checkInTime: Date,
     checkOutTime: Date,
     breakTimes: [{
@@ -37,7 +35,6 @@ const attendanceSchema = new mongoose.Schema({
         default: 0
     }
 });
-
 
 const Admin = mongoose.model('Admin', adminSchema);
 const Employee = mongoose.model('Employee', employeeSchema);

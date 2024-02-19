@@ -1,0 +1,12 @@
+
+:root{
+    --darkbg: #0f0f0f;
+    --white-text : #fff;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--white-text);
+    background-color: var(--darkbg);   
+}

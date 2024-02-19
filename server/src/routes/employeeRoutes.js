@@ -33,7 +33,7 @@ router.post('/signup', async(req, res)=>{
     }else{
         const emp = new Employee({username, email, password});
         emp.save()
-            .then(emp => res.json({messege: "Employee Created Succesfully", emp}))
+            .then(empl => res.json({messege: "Employee Created Succesfully", emp:{username: empl.username, email: empl.email}}))
             .catch(err => res.status(500).json({error: "Not able to create employee", err}))
     }
 })
@@ -52,9 +52,9 @@ router.post('/login', async(req, res)=>{
         const token = jwt.sign(
             { _id: emp._id, email, role: 'emp' },
             SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '14h' }
         );
-        res.json({messege: "Logged in succesfully", token})
+        res.json({messege: "Logged in succesfully", token ,username: emp.username})
     }else{
         res.status(400).json({error: "Invalid Creadentials"})
     }
@@ -65,11 +65,11 @@ router.post('/checkin', authenticate, async (req,res)=>{
         // Extract user ID from the authenticated request
         const { _id: employeeId } = req.user;
         const { date, checkInTime } = req.body;
-        console.log({date, checkInTime});
+        console.log("this is from checkin",{date, checkInTime});
         // Check if the user has already checked in for the specified date
         const existingAttendance = await Attendance.findOne({
             employeeId,
-            date: date || new Date()
+            date: date
         });
 
         if (existingAttendance) {
@@ -84,7 +84,7 @@ router.post('/checkin', authenticate, async (req,res)=>{
 
         await newAttendance.save();
 
-        res.status(201).json({ message: 'Check-in successful', attendance: newAttendance });
+        res.json({ message: 'Check-in successful', attendance: newAttendance });
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
@@ -98,11 +98,11 @@ router.post('/startbreak', authenticate, async (req, res) => {
 
         // Extract data from the request body
         const { date, breakStartTime } = req.body;
-
+  
         // Find the attendance record for the specified user and date
         const attendance = await Attendance.findOne({
             employeeId,
-            date: date || new Date()
+            date: date
         });
 
         if (!attendance) {
@@ -123,7 +123,7 @@ router.post('/startbreak', authenticate, async (req, res) => {
     
         await attendance.save();
 
-        res.status(201).json({ message: 'Break started successfully', attendance });
+        res.json({ message: 'Break started successfully', attendance });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -167,7 +167,7 @@ router.post('/endbreak', authenticate, async (req, res) => {
 
         await attendance.save();
 
-        res.status(201).json({ message: 'Break ended successfully', attendance });
+        res.json({ message: 'Break ended successfully', attendance });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -175,14 +175,15 @@ router.post('/endbreak', authenticate, async (req, res) => {
 });
 
 router.post('/checkout', authenticate, async (req, res) => {
+
     try {
         const { _id: employeeId } = req.user;
 
         const { date, checkOutTime } = req.body;
-
+        console.log("this is from checkout",{date, checkOutTime})
         const attendance = await Attendance.findOne({
             employeeId,
-            date: date || new Date()
+            date: date
         });
 
         if (!attendance) {
@@ -216,7 +217,7 @@ router.post('/checkout', authenticate, async (req, res) => {
         // Save the updated attendance record to the database
         await attendance.save();
 
-        res.status(201).json({
+        res.json({
             message: 'Checkout successful',
             totalWorkedHours,
             attendance
