@@ -28,7 +28,7 @@ function CheckinButton({name}) {
           setIsAuthenticated(false);
         }
 
-        const response = await axios.post(`http://192.168.1.6:8000/api/emp/v1/checkin`, {
+        const response = await axios.post(`http://192.168.1.14:8000/api/emp/v1/checkin`, {
           checkInTime: currentTime,
           date : todayDate
         }, {
@@ -67,7 +67,7 @@ function CheckinButton({name}) {
   };
   return (
     <div>
-      <button className='check-in-btn' onClick={handleCheckin}>Check In</button>
+      <button className='btn btn-hover' onClick={handleCheckin}>Check In</button>
     </div>
   )
 }

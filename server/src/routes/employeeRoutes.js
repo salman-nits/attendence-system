@@ -235,9 +235,8 @@ router.get('/me', authenticate, async (req,res)=>{
         const attendanceData = await Attendance.find({ employeeId });
 
         if (!attendanceData || attendanceData.length === 0) {
-            return res.status(404).json({ message: 'No attendance records found for the user' });
+            return res.json({ message: 'No attendance records found for the user', attendance: [] });
         }
-
         res.status(200).json({ message: 'Attendance data retrieved successfully', attendance: attendanceData });
     } catch (error) {
         console.error(error);

@@ -29,7 +29,7 @@ function CheckoutButton({name}) {
           setIsAuthenticated(false);
         }
         console.log(currentTime, todayDate);
-        const response = await axios.post(`http://192.168.1.6:8000/api/emp/v1/checkout`, {
+        const response = await axios.post(`http://192.168.1.14:8000/api/emp/v1/checkout`, {
           checkOutTime: currentTime,
           date : todayDate
         }, {
@@ -57,7 +57,7 @@ function CheckoutButton({name}) {
   }
   return (
     <div>
-      <button className='check-out-btn' onClick={handleChekout}>Check out</button>
+      <button className='btn btn-hover' onClick={handleChekout}>Check out</button>
     </div>
   )
 }

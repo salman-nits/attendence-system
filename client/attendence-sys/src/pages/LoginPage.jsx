@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import './login.css'; // Import your CSS file for styling
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authContext } from '../App';
 //client\attendence-sys\src\pages\login.css
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const {isAuthenticated, setIsAuthenticated} = useContext(authContext)
+    const navigate = useNavigate();
     const handleEmailChange = (e) => {
       setEmail(e.target.value);
     };
@@ -19,7 +20,7 @@ function LoginPage() {
     const handleSubmit = (e) => {
       e.preventDefault();
   
-      axios.post(`http://192.168.1.6:8000/api/emp/v1//login`,
+      axios.post(`http://192.168.1.14:8000/api/emp/v1//login`,
       {
         email,
         password
@@ -33,8 +34,8 @@ function LoginPage() {
             localStorage.setItem("my_username", username);
             let messege = res.data.messege;
             alert(messege);
-            window.location.href = '/dashboard';
-            setIsAuthenticated(true);
+            navigate('/dashboard')
+            
         }else{
             alert("Invalid Request");
         }

@@ -39,6 +39,7 @@ const attendanceSchema = new mongoose.Schema({
 const Admin = mongoose.model('Admin', adminSchema);
 const Employee = mongoose.model('Employee', employeeSchema);
 const Attendance = mongoose.model('Attendance', attendanceSchema);
+
 module.exports = {
     Admin,
     Employee,

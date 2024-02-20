@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { authContext} from '../App';
 import axios from 'axios';
+import './btns.css'
 
 function StartBreakButton({name}) {
   const {isAuthenticated, setIsAuthenticated, ischeckedIn,
@@ -30,7 +31,7 @@ function StartBreakButton({name}) {
         }
        
 
-        const response = await axios.post(`http://192.168.1.6:8000/api/emp/v1/startbreak`, {
+        const response = await axios.post(`http://192.168.1.14:8000/api/emp/v1/startbreak`, {
           checkInTime: currentTime,
           date : localStorage.getItem("todays_date")
         }, {
@@ -56,7 +57,7 @@ function StartBreakButton({name}) {
   }
   return (
     <div>
-      <button className='break-start-btn' onClick={handkeStartBreak}>Break Start</button>
+      <button className='btn btn-hover' onClick={handkeStartBreak}>Break Start</button>
     </div>
   )
 }

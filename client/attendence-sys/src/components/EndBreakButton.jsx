@@ -27,7 +27,7 @@ function EndBreakButton({name}) {
           setIsAuthenticated(false);
         }
         console.log(currentTime, todayDate);
-        const response = await axios.post(`http://192.168.1.6:8000/api/emp/v1/endbreak`, {
+        const response = await axios.post(`http://192.168.1.14:8000/api/emp/v1/endbreak`, {
           checkOutTime: currentTime,
           date : todayDate
         }, {
@@ -52,7 +52,7 @@ function EndBreakButton({name}) {
 }
   return (
     <div>
-      <button className='end-break-btn' onClick={handleEndBrek}>Break End</button>
+      <button className='btn btn-hover' onClick={handleEndBrek}>Break End</button>
     </div>
   )
 }
