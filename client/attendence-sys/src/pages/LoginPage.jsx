@@ -42,7 +42,7 @@ function LoginPage() {
 
       })//
       .catch(error => {
-        alert("trt again");
+        alert("try again");
       })
       // Reset the form
       setEmail('');
