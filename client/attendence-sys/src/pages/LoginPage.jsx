@@ -20,7 +20,7 @@ function LoginPage() {
     const handleSubmit = (e) => {
       e.preventDefault();
   
-      axios.post(`https://attendence-system-psi.vercel.app/emp/v1/login`,
+      axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/login`,
       {
         email,
         password
