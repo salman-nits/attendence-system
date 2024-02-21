@@ -34,7 +34,7 @@ function LoginPage() {
             localStorage.setItem("my_username", username);
             let messege = res.data.messege;
             alert(messege);
-            navigate('/dashboard')
+            navigate('/')
             
         }else{
             alert("Invalid Request");
