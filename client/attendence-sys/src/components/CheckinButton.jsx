@@ -27,7 +27,7 @@ function CheckinButton({name}) {
           setIsAuthenticated(false);
         }
 
-        const response = await axios.post(`http://192.168.1.34:8000/api/emp/v1/checkin`, {
+        const response = await axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/checkin`, {
           checkInTime: currentTime,
           date : todayDate
         }, {

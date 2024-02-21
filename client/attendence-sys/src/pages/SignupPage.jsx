@@ -29,7 +29,7 @@ function SignupPage() {
       console.log('Email:', email);
       console.log('Password:', password);
 
-      axios.post(`http://192.168.1.34:8000/api/emp/v1/signup`,
+      axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/signup`,
       {
         username,
         email,

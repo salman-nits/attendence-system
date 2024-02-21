@@ -20,7 +20,7 @@ function LoginPage() {
     const handleSubmit = (e) => {
       e.preventDefault();
   
-      axios.post(`http://192.168.1.34:8000/api/emp/v1//login`,
+      axios.post(`https://attendence-system-psi.vercel.app/emp/v1//login`,
       {
         email,
         password

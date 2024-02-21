@@ -27,7 +27,7 @@ function EndBreakButton({name}) {
           setIsAuthenticated(false);
         }
         console.log(currentTime, todayDate);
-        const response = await axios.post(`http://192.168.1.34:8000/api/emp/v1/endbreak`, {
+        const response = await axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/endbreak`, {
           checkOutTime: currentTime,
           date : todayDate
         }, {

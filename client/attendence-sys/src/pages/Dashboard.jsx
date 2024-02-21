@@ -23,7 +23,7 @@ function Dashboard() {
       setIsAuthenticated(false);
       navigate('/login');
     }
-    axios.get(`http://192.168.1.34:8000/api/emp/v1/me`,{
+    axios.get(`https://attendence-system-psi.vercel.app/api/emp/v1/me`,{
       headers: {
         'Authorization': `Bearer ${t}`, // Include the auth token in the headers
         'Content-Type': 'application/json',

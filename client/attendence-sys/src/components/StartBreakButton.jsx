@@ -31,7 +31,7 @@ function StartBreakButton({name}) {
         }
        
 
-        const response = await axios.post(`http://192.168.1.34:8000/api/emp/v1/startbreak`, {
+        const response = await axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/startbreak`, {
           checkInTime: currentTime,
           date : localStorage.getItem("todays_date")
         }, {
