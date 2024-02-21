@@ -9,7 +9,6 @@ function CheckinButton({name}) {
   const handleCheckin = async () => {
     
     if(localStorage.getItem("todays_date")){
-      
       alert(`${name}, You are already Checked in`)
     }
     else{
@@ -28,7 +27,7 @@ function CheckinButton({name}) {
           setIsAuthenticated(false);
         }
 
-        const response = await axios.post(`http://192.168.1.14:8000/api/emp/v1/checkin`, {
+        const response = await axios.post(`http://192.168.1.34:8000/api/emp/v1/checkin`, {
           checkInTime: currentTime,
           date : todayDate
         }, {

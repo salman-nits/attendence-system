@@ -20,7 +20,7 @@ function LoginPage() {
     const handleSubmit = (e) => {
       e.preventDefault();
   
-      axios.post(`http://192.168.1.14:8000/api/emp/v1//login`,
+      axios.post(`http://192.168.1.34:8000/api/emp/v1//login`,
       {
         email,
         password
@@ -40,11 +40,9 @@ function LoginPage() {
             alert("Invalid Request");
         }
 
-      })
+      })//
       .catch(error => {
-        if(error.response.status){
-            alert(error.response.data.error);
-        }
+        alert("trt again");
       })
       // Reset the form
       setEmail('');
