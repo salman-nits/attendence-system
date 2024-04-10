@@ -38,7 +38,11 @@ function EndBreakButton({name}) {
         }
 
       } catch (error) {
-        console.error('Error during Break stop:', error);
+        // console.error('Error during Break stop:', error);
+        if(error.response.status === 400){
+          const errorMessege = error.response.data.message;
+          alert(errorMessege);
+        }
         // Handle error, display a message to the user, etc.
       }
   }
