@@ -17,7 +17,6 @@ app.use('/api/admin/v1',adminRouter);
 app.use('/api/emp/v1', employeeRouter);
 
 app.listen(port, '0.0.0.0',() => {
-  
   console.log(`Server is running on http://0.0.0.0:${port}`)
 })
 

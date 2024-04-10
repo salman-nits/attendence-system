@@ -21,7 +21,7 @@ const loginInputs = z.object({
 router.post('/signup', async(req, res)=>{
     const parsedInputs = signuInputs.safeParse(req.body);
     if(!parsedInputs.success){
-        return res.status(400).json({error: "Enter valid inputs"})
+        return res.status(400).json({error: parsedInputs.error})
     }
     let username = parsedInputs.data.username;
     let email = parsedInputs.data.email;
@@ -41,7 +41,7 @@ router.post('/signup', async(req, res)=>{
 router.post('/login', async(req, res)=>{
     const parsedInputs = loginInputs.safeParse(req.body);
     if(!parsedInputs.success){
-        return res.status(400).json({error: "Enter valid inputs"})
+        return res.status(400).json({error: parsedInputs.error})
     }
 
     let email = parsedInputs.data.email;
@@ -65,7 +65,7 @@ router.post('/checkin', authenticate, async (req,res)=>{
         // Extract user ID from the authenticated request
         const { _id: employeeId } = req.user;
         const { date, checkInTime } = req.body;
-        // console.log("this is from checkin",{date, checkInTime});
+        console.log("this is from checkin",{date, checkInTime});
         // Check if the user has already checked in for the specified date
         const existingAttendance = await Attendance.findOne({
             employeeId,
@@ -78,8 +78,8 @@ router.post('/checkin', authenticate, async (req,res)=>{
         // if not checked in then create new record and save that
         const newAttendance = new Attendance({
             employeeId,
-            date: date,
-            checkInTime: checkInTime
+            date: date || new Date(),
+            checkInTime: checkInTime || new Date()
         });
 
         await newAttendance.save();
@@ -118,7 +118,7 @@ router.post('/startbreak', authenticate, async (req, res) => {
         }
 
         // Add a new break entry with the provided start time
-        attendance.breakTimes.push({ start: breakStartTime});
+        attendance.breakTimes.push({ start: breakStartTime || new Date() });
 
     
         await attendance.save();
@@ -141,7 +141,7 @@ router.post('/endbreak', authenticate, async (req, res) => {
         // Find the attendance record for the specified user and date
         const attendance = await Attendance.findOne({
             employeeId,
-            date: date
+            date: date || new Date()
         });
 
         if (!attendance) {
@@ -159,7 +159,7 @@ router.post('/endbreak', authenticate, async (req, res) => {
         }
 
         // Set the end time for the active break
-        activeBreak.end = breakEndTime;
+        activeBreak.end = breakEndTime || new Date();
 
         // Calculate the duration of the break and update totalWorkedHours
         const breakDuration = activeBreak.end - activeBreak.start;
@@ -180,6 +180,7 @@ router.post('/checkout', authenticate, async (req, res) => {
         const { _id: employeeId } = req.user;
 
         const { date, checkOutTime } = req.body;
+        console.log("this is from checkout",{date, checkOutTime})
         const attendance = await Attendance.findOne({
             employeeId,
             date: date
@@ -200,7 +201,7 @@ router.post('/checkout', authenticate, async (req, res) => {
             attendance.checkOutTime = new Date();
         }
 
-        const checkInTime = attendance.checkInTime;
+        const checkInTime = attendance.checkInTime || attendance.date;
         const breaksDuration = attendance.breakTimes.reduce((total, breakEntry) => {
             if (breakEntry.start && breakEntry.end) {
                 return total + (breakEntry.end - breakEntry.start);
