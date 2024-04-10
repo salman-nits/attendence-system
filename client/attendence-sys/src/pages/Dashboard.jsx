@@ -19,7 +19,7 @@ function Dashboard() {
     setUserName(localStorage.getItem("my_username"));
     const t = localStorage.getItem("my_token");
     if(!t){
-      console.log("false  ")
+      
       setIsAuthenticated(false);
       navigate('/login');
     }
@@ -31,7 +31,7 @@ function Dashboard() {
     })
     .then(res => {
       setAttendance(res.data.attendance)
-      console.log("this is the attendnce",res.data.attendance)
+      
     })
     .catch(err=> {
       if(err.response && err.response.status === 401){

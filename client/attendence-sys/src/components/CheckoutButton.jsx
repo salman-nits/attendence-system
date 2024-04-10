@@ -7,10 +7,13 @@ function CheckoutButton({name}) {
     setIsCheckedIn, isOnBreak, setIsOnBreak, isCheckedOut, setIsCheckedOut} = useContext(authContext);
 
   const handleChekout = async () => {
-    let todayDate  = localStorage.getItem("todays_date")
-    if(!todayDate){
-      alert(`${name}, You are not checked in/ you are cheked out already`);
-    }
+    const nowDate = new Date();
+    const year = nowDate.getFullYear();
+    const month = nowDate.getMonth() + 1; // Months are zero-indexed in JavaScript
+    const day = nowDate.getDate();
+
+    const todayDate = `${day}-${month}-${year}`;
+       
     if(localStorage.getItem("break_start_time")){
       alert(`${name}, First end the break and then checkout.`);
     }
@@ -28,7 +31,6 @@ function CheckoutButton({name}) {
         if(!authToken){
           setIsAuthenticated(false);
         }
-        console.log(currentTime, todayDate);
         const response = await axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/checkout`, {
           checkOutTime: currentTime,
           date : todayDate
@@ -40,7 +42,7 @@ function CheckoutButton({name}) {
         });
   
         if (response.status === 200) {
-          console.log('check out successful:', response.data);
+          alert("checkout succesfull");
         } else {
           throw new Error(`Failed to check out. Status: ${response.status}`);
         }

@@ -8,13 +8,13 @@ function StartBreakButton({name}) {
     setIsCheckedIn, isOnBreak, setIsOnBreak, isCheckedOut, setIsCheckedOut} = useContext(authContext);
 
   const handkeStartBreak = async()=>{
-    if(!localStorage.getItem("todays_date")){
-      alert(`${name},  you can not start break before check in or after checkout`);
-    }
-    if(localStorage.getItem("break_start_time")){
-      alert(`${name}, You are already on break`)
-    }
-    else{
+    const nowDate = new Date();
+    const year = nowDate.getFullYear();
+    const month = nowDate.getMonth() + 1; // Months are zero-indexed in JavaScript
+    const day = nowDate.getDate();
+
+    const todayDate = `${day}-${month}-${year}`;
+    
       try {
         const breakStartTime = new Date();
         // const year = nowDate.getFullYear();
@@ -33,7 +33,7 @@ function StartBreakButton({name}) {
 
         const response = await axios.post(`https://attendence-system-psi.vercel.app/api/emp/v1/startbreak`, {
           checkInTime: currentTime,
-          date : localStorage.getItem("todays_date")
+          date : todayDate
         }, {
           headers: {
             'Authorization': `Bearer ${authToken}`, // Include the auth token in the headers
@@ -42,18 +42,18 @@ function StartBreakButton({name}) {
         });
   
         if (response.status === 200) {
-          localStorage.setItem("break_start_time", breakStartTime);
-          console.log('break start:', response.data);
-
-        } else {
-             }
+          alert("Started Break");
+        }
   
       } catch (error) {
         console.error('Error during starting break:', error);
+        if(error.response.status === 400){
+           
+          alert(errorMessege);
+        }
         // Handle error, display a message to the user, etc.
       }
-      setIsOnBreak(true);
-    }
+    
   }
   return (
     <div>

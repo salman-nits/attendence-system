@@ -1,17 +1,15 @@
 import React, { useContext } from 'react';
 import { authContext} from '../App';
 import axios from 'axios';
-import { NavLink } from 'react-router-dom';
+
 
 function CheckinButton({name}) {
   const {isAuthenticated, setIsAuthenticated, ischeckedIn,
     setIsCheckedIn, isOnBreak, setIsOnBreak, isCheckedOut, setIsCheckedOut} = useContext(authContext);
   const handleCheckin = async () => {
     
-    if(localStorage.getItem("todays_date")){
-      alert(`${name}, You are already Checked in`)
-    }
-    else{
+    
+    
       try {
         const nowDate = new Date();
         const year = nowDate.getFullYear();
@@ -39,7 +37,6 @@ function CheckinButton({name}) {
   
        if(response){
         if (response.status === 200) {
-          localStorage.setItem("todays_date", todayDate);
           console.log('Check in successful:', response.data);
         } else {
          console.log("this is from else condition",response)  
@@ -62,7 +59,7 @@ function CheckinButton({name}) {
       setIsCheckedIn(true);
       setIsOnBreak(false);
       setIsCheckedOut(false);
-    }
+    
   };
   return (
     <div>

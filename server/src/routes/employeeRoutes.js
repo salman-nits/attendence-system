@@ -200,7 +200,9 @@ router.post('/checkout', authenticate, async (req, res) => {
         } else {
             attendance.checkOutTime = new Date();
         }
-
+        // if (attendance.breakTimes.some(breakEntry => !breakEntry.end)) {
+        //     return res.status(400).json({ message: 'User has already started a break' });
+        // }
         const checkInTime = attendance.checkInTime || attendance.date;
         const breaksDuration = attendance.breakTimes.reduce((total, breakEntry) => {
             if (breakEntry.start && breakEntry.end) {
