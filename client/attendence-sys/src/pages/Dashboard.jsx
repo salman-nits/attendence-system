@@ -39,6 +39,8 @@ function Dashboard() {
         navigate('/login');
       }
       console.log(err)
+      navigate('/login');
+
     });
 // response.status
 
